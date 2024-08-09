@@ -1,0 +1,100 @@
+Hi! I don't know your name so it's a bit awkward, but don't worry, I'll help you out reviewing your code regarding the priorityQueue function you've created.
+
+I'll go as I find issues, so bear with me for a bit and I'll try to organize my thoughts in terms of priority and technical requirements, so that your PR does not get THAT stuck, as I don't really know how urgent your changes are due.
+
+About the PriorityQueue function itself:
+
+- First up, regarding its architecture, constructor functions like the one you've used are a bit outdated nowadays. We could replace this with a proper class, which I'll give you an example of in a separate file. You'll notice that using a class will improve the readability of it all as well as its consistency, which is a huge plus.
+
+- Since we're on the topic of readability and consistency, make sure to follow a certain pattern when it comes to naming methods.
+For example, the "add" method is written in lowercase, but "Pop" has a capital P. This goes beyond the constructor function declaration itself, as you may see that "get_all_priorities" has underscores and changePriority is camelCase.
+
+Make sure to rewrite their names under the same pattern, like:
+
+add
+pop
+getAllPriorities
+changePriority
+
+- Going back to the PriorityQueue declaration, I also noticed you're expecting a "size" argument but you're not using it anywhere. Maybe you forgot to use it? If we don't need it, we should remove it to avoid confusion.
+
+- The this.length of the queue could renamed to something like "getQueueLength" or "getQueueCount" or something along those lines. This is because whenever you read an entity's length, you would most probably expect to obtain a number. However in this case you're returning a function which returns the count property, and therefore you'd have to call it like:
+
+const queue = new PriorityQueue();
+console.log(queue.length()) // This would work, as not calling the returned function would simply print the function itself.
+
+However, truth be told, you may find that this method is not necessary at all, since you could directly read the count prop from the instance itself:
+
+const queue = new PriorityQueue();
+console.log(priorityQueue.count) // This would print out your queue's count.
+
+In other words, just go ahead and remove the this.length declaration.
+
+You should also consider moving all related methods within the declaration itself, so that they all are declared and read by any other colleague within the same scope they live in.
+
+--- Moving onto each method:
+
+add method:
+----------
+
+Make sure to properly validate the provided arguments, and using === instead of == when performing this and any other kind of comparison so you validate both in terms of value and type. 
+
+You're expecting a integer, but nowadays any kind of value could be passed to it like strings or even falsy values like undefined, so make sure to prevent that.
+
+Regarding the business logic of it all, I think we should rethink the count property itself and ask ourselves what are we counting. 
+This is because the count value goes one up everytime you add something new. 
+On paper it sounds alright, but it does the same exact effect when not only adding a completely new priority, but also when you push a new value to an existing one, which can be super confusing. Maybe we should chat about what you were trying to achieve here and see how can we rethink this :D
+
+Btw, returning this.store after adding a new element helps out anyone using the class to easily obtain the results of the addition process.
+
+pop method:
+----------
+
+Ok so in the first place, make sure to always use a keyword to declare new variables, specially const or let when appropiate. This applies to this method and the other ones as well.
+
+Now, when it comes to the logic of this method, validating the input when adding a new priority like I've mentioned before will help you prevent scenarios where this pop method would simply stop working.
+In this case, you're not validating whether if the queue is already empty or not, so make sure you catch that scenario!
+
+This method is called Pop, claims to return the oldest-added value with the highest priority, and yet it executes a shift and reduces to count by 1...
+
+I'm not 100% sure what you tried to achieve, so pretty much as with the count thing, I think we should go over this on a quick call and see where can we go from there, as I think we may find a solution designing specific responsibilities and come up with different methods for popping things out, retrieving the oldest added value, and so on.
+
+length method:
+--------------
+
+Remove! As explained above, we don't really need this.
+
+get_all_priorities method:
+-------------------------
+
+This one's pretty straightforward, and I don't think there anything particular wrong with it. I'd just move it within the constructor function declaration, add a comment regarding its purpose as you did with the other methods for consistency purposes, and for now call it a day.
+
+
+forEach method:
+--------------
+
+I'm not sure we really need this. I think I would just let the user decide how to iterate on the instance itself instead of providing a prestablished forEach method which does not allow to determine how to sort the store itself.
+
+I'd just remove it, but we can talk about it if there's a situation that requires this.
+
+changePriority method:
+---------------------
+
+This is an scenario where the previous forEach thing plays against us. When attempting to use it, you'll notice that forEach is not a function.
+This is because the store itself is not an array, and therefore does not have a forEach method.
+
+Since it's not an array, we don't really need to iterate through it in order to move an existing object property.
+
+We can change this whole method to firstly validate if the given values are correct. I mean, the given value should match an existing priority item, and the new one given should be an "empty spot" for us to move the existing one towards to.
+
+Once we're past those checks, we can safely preserve the values, delete the old one, and use the preserved values in the new property based on the newPriority value, therefore "moving" the priority around the store.
+
+I'll go ahead and provide an example of this in the class-based version of your PriorityQueue so I can walk you through it, don't worry. :D
+
+-------
+
+Closing down, there are many more details regarding performance, syntax, variable naming, and probably the architecture itself, as I think you could handle this far better using an array for the store instead of an object; but I don't want to overwhelm you that much and I'd like to know how you approached this and well, because I'm pretty sure that I may be missing more stuff that we may find together.
+
+I'll give you a starting point rewriting the constructor function as a ES6 class, and we can hop on a call so we can move forward from there reviewing each of these steps! 
+
+What do you think? We could also add a bit of JSDoc to the mix as well, in order to properly document the class itself. See you!
